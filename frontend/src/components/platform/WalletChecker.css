@@ -1,0 +1,33 @@
+.network-picker { display: flex; flex-direction: column; gap: 8px; }
+
+.network-picker-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+}
+
+.network-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.network-btn {
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.4);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.network-btn:hover {
+  border-color: rgba(59,130,246,0.35);
+  color: rgba(255,255,255,0.8);
+}
+
+.network-btn.active {
+  background: rgba(59,130,246,0.12);
+  border-color: var(--accent);
+  color: var(--white);
+}

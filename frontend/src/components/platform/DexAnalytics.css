@@ -1,0 +1,123 @@
+.dex-card {
+  background: var(--black2);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-top-color: transparent;
+  transition: border-color 0.15s;
+}
+
+.dex-card:first-child {
+  border-top-color: rgba(59,130,246,0.25);
+}
+
+.dex-card-open {
+  border-color: rgba(59,130,246,0.2);
+  border-top-color: rgba(59,130,246,0.4);
+}
+
+.dex-card-header {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px 1fr 20px;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.dex-card-header:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.dex-rank {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+}
+
+.dex-card:first-child .dex-rank { color: var(--accent2); }
+
+.dex-main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.dex-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dex-name {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.dex-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.dex-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.dex-tvl {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dex-desc-short {
+  font-size: 11px;
+  color: rgba(255,255,255,0.28);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dex-details {
+  padding: 0 16px 18px 66px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.dex-risks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dex-risk-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  padding: 7px 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+@media (max-width: 640px) {
+  .dex-card-header { grid-template-columns: 28px 1fr 16px; gap: 10px; padding: 12px; }
+  .dex-details { padding-left: 12px; }
+  .dex-desc-short { white-space: normal; }
+}

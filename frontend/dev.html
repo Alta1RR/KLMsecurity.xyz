@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KLMsecurity.xyz — Web3 Security Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black:      #07080c;
+  --black2:     #0d0f16;
+  --black3:     #12151f;
+  --cream:      #f0ece3;
+  --cream2:     #e5e0d6;
+  --white:      #f8f9ff;
+  --accent:     #3b82f6;       /* синий вместо лайма */
+  --accent2:    #06b6d4;       /* циан как второй акцент */
+  --danger:     #ef4444;
+  --text-dark:  #18191e;
+  --muted-dark: #5c5c6b;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono:  'Space Mono', monospace;
+  --font-sans:  'Inter', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════
+   TOP TICKER
+══════════════════════════ */
+.ticker-bar {
+  width: 100%;
+  height: 30px;
+  background: var(--black2);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.ticker-track {
+  display: flex;
+  animation: scroll 35s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.t-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 24px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.07em;
+  color: #3a3d4a;
+  border-right: 1px solid rgba(255,255,255,0.03);
+}
+
+.t-item .k { color: #2d3040; text-transform: uppercase; }
+.t-item .v { color: rgba(255,255,255,0.55); }
+.t-item .up   { color: var(--accent2); }
+.t-item .down { color: var(--danger); }
+
+/* ══════════════════════════
+   NAV
+══════════════════════════ */
+nav {
+  position: sticky;
+  top: 30px;
+  z-index: 99;
+  width: 100%;
+  height: 54px;
+  background: rgba(7,8,12,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 44px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 26px; height: 26px;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: color 0.15s;
+  position: relative;
+}
+
+.nav-links a:hover { color: rgba(255,255,255,0.85); }
+
+.nav-links a.active {
+  color: var(--white);
+}
+
+.nav-links a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 1px;
+  background: var(--accent);
+}
+
+.nav-right { display: flex; align-items: center; gap: 14px; }
+
+.online-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent2);
+  letter-spacing: 0.06em;
+}
+
+.pulse-dot {
+  width: 5px; height: 5px;
+  background: var(--accent2);
+  border-radius: 50%;
+  animation: pulse 2.5s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(6,182,212,0.4); }
+  50%      { opacity:0.5; box-shadow: 0 0 0 4px rgba(6,182,212,0); }
+}
+
+.btn-nav {
+  padding: 7px 16px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  padding-left: 20px; padding-right: 20px;
+}
+
+.btn-nav:hover { background: var(--accent2); }
+
+/* ══════════════════════════
+   HERO
+══════════════════════════ */
+.hero {
+  background: var(--black);
+  min-height: calc(100vh - 84px);
+  display: grid;
+  grid-template-columns: 55% 45%;
+  align-items: center;
+  padding: 72px 44px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* animated hex grid bg */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hex-grid {
+  position: absolute;
+  top: -10%; right: -5%;
+  width: 55%; height: 120%;
+  opacity: 0.04;
+  background-image:
+    radial-gradient(circle, #fff 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+
+.orb1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+  top: -100px; right: 80px;
+}
+
+.orb2 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%);
+  bottom: 40px; left: 200px;
+}
+
+/* scanline effect across hero */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px
+  );
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.hero-left { position: relative; z-index: 2; }
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
+
+.eyebrow-line {
+  width: 28px; height: 1px;
+  background: var(--accent);
+}
+
+.eyebrow-accent { color: var(--accent); }
+
+h1.h-title {
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 5.2vw, 78px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+h1.h-title .italic-word {
+  font-style: italic;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.5);
+}
+
+h1.h-title .blue-word {
+  font-style: italic;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: rgba(255,255,255,0.38);
+  line-height: 1.75;
+  max-width: 400px;
+  margin: 20px 0 36px;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 44px;
+}
+
+.btn-cta-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-cta-main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-cta-main:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(59,130,246,0.35); }
+.btn-cta-main:hover::before { opacity: 1; }
+
+.btn-cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 13px 26px;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-cta-ghost:hover {
+  border-color: rgba(255,255,255,0.25);
+  color: var(--white);
+}
+
+.hero-proof {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.proof-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.proof-item::before {
+  content: '✓';
+  color: var(--accent2);
+  font-size: 10px;
+}
+
+/* HERO RIGHT */
+.hero-right {
+  position: relative;
+  z-index: 2;
+  padding-left: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* terminal-style widget */
+.widget {
+  background: var(--black2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(59,130,246,0.3);
+  padding: 0;
+  overflow: hidden;
+}
+
+.w-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.w-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.w-label::before { content: '◆ '; color: var(--accent); font-size: 6px; }
+
+.w-live {
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--accent2);
+  letter-spacing: 0.1em;
+}
+
+.w-live-dot {
+  width: 4px; height: 4px;
+  background: var(--accent2);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.w-body { padding: 14px; }
+
+/* score widget */
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.score-circle {
+  position: relative;
+  width: 60px; height: 60px;
+  flex-shrink: 0;
+}
+
+.score-circle svg { transform: rotate(-90deg); }
+
+.score-text {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.score-info {}
+.score-val { font-family: var(--font-mono); font-size: 22px; color: var(--white); font-weight: 700; line-height: 1; }
+.score-lbl { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+
+/* chart widget */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 38px;
+  margin-bottom: 8px;
+}
+
+.b {
+  flex: 1;
+  background: rgba(59,130,246,0.15);
+  border-top: 1px solid rgba(59,130,246,0.3);
+  transition: background 0.2s;
+}
+
+.b:hover, .b.hi { background: rgba(59,130,246,0.4); border-color: var(--accent); }
+
+.chart-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.chart-big { font-family: var(--font-mono); font-size: 22px; color: var(--white); font-weight: 700; }
+.chart-tag { font-family: var(--font-mono); font-size: 9px; color: rgba(255,255,255,0.25); }
+
+/* feed widget */
+.feed-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 11px;
+}
+
+.feed-row:last-child { border-bottom: none; }
+.feed-name { color: rgba(255,255,255,0.4); font-family: var(--font-sans); }
+.feed-count { color: var(--white); font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+.feed-up   { color: var(--accent2); font-family: var(--font-mono); font-size: 9px; }
+.feed-down { color: var(--danger); font-family: var(--font-mono); font-size: 9px; }
+
+.w-footer {
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.015);
+  border-top: 1px solid rgba(255,255,255,0.03);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.w-footer .accent { color: var(--accent); }
+
+/* ══════════════════════════
+   STATS BAR
+══════════════════════════ */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--black2);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.s-cell {
+  padding: 32px 40px;
+  border-right: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.2s;
+  cursor: default;
+  position: relative;
+}
+
+.s-cell:last-child { border-right: none; }
+.s-cell:hover { background: rgba(255,255,255,0.015); }
+
+.s-cell:hover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+.s-num {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.s-num .unit {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--accent2);
+  vertical-align: baseline;
+}
+
+.s-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+/* ══════════════════════════
+   CREAM SECTION
+══════════════════════════ */
+.sect-cream {
+  background: var(--cream);
+  color: var(--text-dark);
+  padding: 88px 44px;
+  position: relative;
+}
+
+.sect-cream::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px,
+    transparent 1px, transparent 32px
+  );
+  pointer-events: none;
+}
+
+.s-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--danger);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.s-eyebrow::before {
+  content: '';
+  width: 20px; height: 1px;
+  background: var(--danger);
+}
+
+h2.s-title {
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 3.8vw, 56px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--text-dark);
+  max-width: 520px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.s-sub {
+  font-size: 13px;
+  color: var(--muted-dark);
+  margin-bottom: 52px;
+  position: relative;
+  font-family: var(--font-sans);
+}
+
+.prob-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--cream2);
+  position: relative;
+}
+
+.prob-col {
+  padding: 32px 28px;
+  border-right: 1px solid var(--cream2);
+  position: relative;
+  transition: background 0.2s;
+}
+
+.prob-col:last-child { border-right: none; }
+.prob-col:hover { background: var(--cream2); }
+
+.prob-col::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--danger), transparent);
+}
+
+.prob-big {
+  font-family: var(--font-serif);
+  font-size: 56px;
+  line-height: 1;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.prob-big .sup-accent {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  color: var(--danger);
+  vertical-align: super;
+}
+
+.prob-name {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 7px;
+}
+
+.prob-desc {
+  font-size: 12px;
+  color: var(--muted-dark);
+  line-height: 1.65;
+  margin-bottom: 14px;
+  font-family: var(--font-sans);
+}
+
+.prob-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.18);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--danger);
+}
+
+/* ══════════════════════════
+   TOOLS (dark)
+══════════════════════════ */
+.sect-dark {
+  background: var(--black);
+  padding: 88px 44px;
+}
+
+.sect-dark .s-eyebrow { color: var(--accent2); }
+.sect-dark .s-eyebrow::before { background: var(--accent2); }
+
+h2.s-title-light {
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 3.8vw, 56px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  max-width: 520px;
+  margin-bottom: 14px;
+}
+
+.s-sub-light {
+  font-size: 13px;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 48px;
+  font-family: var(--font-sans);
+}
+
+.bento {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.b-tile {
+  background: var(--black);
+  padding: 28px 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.b-tile.featured { grid-column: span 2; }
+
+.b-tile::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.b-tile:hover { background: rgba(255,255,255,0.018); }
+.b-tile:hover::before { opacity: 1; }
+
+.b-tile:active { background: rgba(59,130,246,0.04); }
+
+.t-ico {
+  width: 34px; height: 34px;
+  margin-bottom: 18px;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+}
+
+.b-tile:hover .t-ico { opacity: 0.9; }
+
+.t-name {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 7px;
+  letter-spacing: -0.01em;
+}
+
+.t-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.32);
+  line-height: 1.65;
+  font-family: var(--font-sans);
+  flex: 1;
+  margin-bottom: 18px;
+}
+
+.t-tag {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.6;
+}
+
+.t-bar { margin-top: 20px; }
+
+.t-bar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 5px;
+}
+
+.t-track {
+  height: 1.5px;
+  background: rgba(255,255,255,0.07);
+}
+
+.t-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 1.4s ease;
+}
+
+/* ══════════════════════════
+   STEPS (cream)
+══════════════════════════ */
+.sect-steps {
+  background: var(--cream);
+  padding: 88px 44px;
+  position: relative;
+}
+
+.sect-steps::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px,
+    transparent 1px, transparent 32px
+  );
+  pointer-events: none;
+}
+
+.steps-inner { text-align: center; }
+
+.steps-inner .s-eyebrow {
+  justify-content: center;
+  color: var(--muted-dark);
+}
+
+.steps-inner .s-eyebrow::before { background: var(--muted-dark); }
+
+.steps-inner h2.s-title {
+  max-width: 100%;
+  text-align: center;
+  margin: 0 auto 56px;
+}
+
+.s-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 860px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.s-grid::before {
+  content: '';
+  position: absolute;
+  top: 32px; left: 16%; right: 16%;
+  height: 1px;
+  background: var(--cream2);
+  z-index: 0;
+}
+
+.step {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px; height: 60px;
+  background: var(--text-dark);
+  margin-bottom: 20px;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  position: relative;
+}
+
+.step-box::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 1px solid var(--cream2);
+}
+
+.step-name {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.step-desc {
+  font-size: 12px;
+  color: var(--muted-dark);
+  line-height: 1.65;
+  margin-bottom: 10px;
+  font-family: var(--font-sans);
+}
+
+.step-note {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--muted-dark);
+  opacity: 0.6;
+}
+
+/* ══════════════════════════
+   CTA BAND
+══════════════════════════ */
+.cta-band {
+  background: var(--black);
+  padding: 96px 44px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.cta-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.cta-orb {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.cta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border: 1px solid rgba(59,130,246,0.25);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 28px;
+  position: relative;
+}
+
+h2.cta-title {
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 4.5vw, 68px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--white);
+  margin-bottom: 18px;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+h2.cta-title .it {
+  font-style: italic;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cta-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.35);
+  max-width: 460px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+.cta-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.cta-btn-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+  box-shadow: 0 0 40px rgba(59,130,246,0.2);
+}
+
+.cta-btn-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(59,130,246,0.35);
+}
+
+.cta-btn-sec {
+  padding: 14px 32px;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cta-btn-sec:hover {
+  border-color: rgba(255,255,255,0.25);
+  color: var(--white);
+}
+
+.cta-note {
+  margin-top: 20px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.18);
+  letter-spacing: 0.08em;
+  position: relative;
+}
+
+/* ══════════════════════════
+   FOOTER GRID
+══════════════════════════ */
+footer {
+  background: var(--black2);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 64px 44px 0;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 80px;
+  padding-bottom: 56px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.footer-brand {}
+
+.f-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.f-tagline {
+  font-size: 12px;
+  color: rgba(255,255,255,0.28);
+  line-height: 1.65;
+  margin-bottom: 24px;
+  font-family: var(--font-sans);
+  max-width: 200px;
+}
+
+.f-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid rgba(6,182,212,0.15);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: var(--accent2);
+  letter-spacing: 0.1em;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.f-col-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.f-col-title::before {
+  content: '';
+  width: 12px; height: 1px;
+  background: rgba(255,255,255,0.15);
+}
+
+.f-col ul { list-style: none; }
+
+.f-col ul li {
+  margin-bottom: 10px;
+}
+
+.f-col ul li a {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.f-col ul li a:hover { color: var(--white); }
+
+.f-col ul li a .f-badge {
+  padding: 1px 5px;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.2);
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.f-col ul li a .f-badge.new {
+  background: rgba(6,182,212,0.1);
+  border-color: rgba(6,182,212,0.2);
+  color: var(--accent2);
+}
+
+/* footer bottom bar */
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.f-copy {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.14);
+  letter-spacing: 0.06em;
+}
+
+.f-links-bottom {
+  display: flex;
+  gap: 20px;
+}
+
+.f-links-bottom a {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,0.18);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.15s;
+}
+
+.f-links-bottom a:hover { color: rgba(255,255,255,0.5); }
+
+/* ══════════════════════════
+   BOTTOM TICKER (fixed)
+══════════════════════════ */
+.bticker {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 26px;
+  background: rgba(7,8,12,0.95);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.bticker .ticker-track { animation-duration: 40s; animation-direction: reverse; }
+.bticker .t-item { color: #25272e; }
+.bticker .t-item .v { color: rgba(255,255,255,0.28); }
+
+main { padding-bottom: 26px; }
+
+/* ══════════════════════════
+   ANIMATIONS
+══════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-left  { animation: fadeUp 0.55s 0.05s both; }
+.hero-right { animation: fadeUp 0.55s 0.2s both; }
+.stats-strip { animation: fadeUp 0.4s 0.35s both; }
+
+/* ══════════════════════════
+   RESPONSIVE
+══════════════════════════ */
+@media (max-width: 960px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .stats-strip { grid-template-columns: repeat(2,1fr); }
+  .prob-grid, .bento, .s-grid, .footer-links { grid-template-columns: 1fr 1fr; }
+  .b-tile.featured { grid-column: span 1; }
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .footer-top { grid-template-columns: 1fr; gap: 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP TICKER -->
+<div class="ticker-bar"><div class="ticker-track" id="tt"></div></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-mark">K</div>
+    KLMsecurity<span style="color:var(--accent)">.</span>xyz
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Главная</a></li>
+    <li><a href="#">Инструменты</a></li>
+    <li><a href="#">Аналитика</a></li>
+    <li><a href="#">Документация</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="online-badge"><div class="pulse-dot"></div>Онлайн</div>
+    <button class="btn-nav">Открыть платформу →</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hex-grid"></div>
+    <div class="glow-orb orb1"></div>
+    <div class="glow-orb orb2"></div>
+  </div>
+
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <div class="eyebrow-line"></div>
+      <span class="eyebrow-accent">KLM_FEED</span>
+      <span>·</span>
+      STATUS: ACTIVE
+      <span>·</span>
+      УГРОЗ СЕГОДНЯ: 3,847
+    </div>
+
+    <h1 class="h-title">
+      Защита<br>
+      <span class="blue-word">крипто-активов</span><br>
+      в реальном времени
+    </h1>
+
+    <p class="hero-sub">
+      Профессиональные инструменты Web3 безопасности.<br>
+      Кошельки, токены, NFT — под полным контролем.<br>
+      Бесплатно. Без регистрации.
+    </p>
+
+    <div class="hero-actions">
+      <button class="btn-cta-main">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Запустить инструменты
+      </button>
+      <button class="btn-cta-ghost">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Проверить адрес
+      </button>
+    </div>
+
+    <div class="hero-proof">
+      <span class="proof-item">Бесплатно</span>
+      <span class="proof-item">6 блокчейнов</span>
+      <span class="proof-item">12K пользователей</span>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="widget">
+      <div class="w-head">
+        <span class="w-label">SECURITY_SCORE</span>
+        <span class="w-live"><div class="w-live-dot"></div>LIVE</span>
+      </div>
+      <div class="w-body">
+        <div class="score-display">
+          <div class="score-circle">
+            <svg width="60" height="60" viewBox="0 0 60 60">
+              <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+              <circle cx="30" cy="30" r="24" fill="none" stroke="url(#sg)" stroke-width="3"
+                stroke-dasharray="150.8" stroke-dashoffset="28" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="sg" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#3b82f6"/>
+                  <stop offset="100%" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="score-text">87</div>
+          </div>
+          <div class="score-info">
+            <div class="score-val">87<span style="font-size:12px;color:rgba(255,255,255,0.2)">/100</span></div>
+            <div class="score-lbl">Индекс безопасности</div>
+          </div>
+        </div>
+      </div>
+      <div class="w-footer">◆ <span class="accent">ETH · BSC · SOL · MATIC</span> и ещё 2 сети</div>
+    </div>
+
+    <div class="widget">
+      <div class="w-head">
+        <span class="w-label">THREAT_MONITOR</span>
+        <span class="w-live"><div class="w-live-dot"></div>LIVE</span>
+      </div>
+      <div class="w-body">
+        <div class="bars" id="miniChart"></div>
+        <div class="chart-stat">
+          <span class="chart-big">34.2%</span>
+          <span class="chart-tag">УРОВЕНЬ УГРОЗ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="w-head">
+        <span class="w-label">LIVE_FEED</span>
+        <span class="w-live"><div class="w-live-dot"></div>LIVE</span>
+      </div>
+      <div class="w-body">
+        <div class="feed-row">
+          <span class="feed-name">Honeypot токены</span>
+          <span class="feed-count">1,203</span>
+          <span class="feed-up">↑ 48.7%</span>
+        </div>
+        <div class="feed-row">
+          <span class="feed-name">Скам кошельки</span>
+          <span class="feed-count">487</span>
+          <span class="feed-down">↑ 2.1%</span>
+        </div>
+        <div class="feed-row">
+          <span class="feed-name">Rug pull NFT</span>
+          <span class="feed-count">312</span>
+          <span class="feed-up">↑ 24.3%</span>
+        </div>
+      </div>
+      <div class="w-footer">◆ Avg response: <span class="accent">47ms</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ═══ -->
+<div class="stats-strip">
+  <div class="s-cell">
+    <div class="s-num"><span class="cnt" data-t="48231">0</span><span class="unit">+</span></div>
+    <div class="s-label">Кошельков проверено</div>
+  </div>
+  <div class="s-cell">
+    <div class="s-num"><span class="cnt" data-t="3847">0</span></div>
+    <div class="s-label">Угроз обнаружено</div>
+  </div>
+  <div class="s-cell">
+    <div class="s-num"><span class="cnt" data-t="6">0</span><span class="unit"> сетей</span></div>
+    <div class="s-label">Поддерживаемых блокчейнов</div>
+  </div>
+  <div class="s-cell">
+    <div class="s-num"><span class="cnt" data-t="12">0</span><span class="unit">K</span></div>
+    <div class="s-label">Активных пользователей</div>
+  </div>
+</div>
+
+<!-- ═══ PROBLEM ═══ -->
+<section class="sect-cream">
+  <div class="s-eyebrow">Проблема</div>
+  <h2 class="s-title">Крипта полна<br>скрытых угроз.</h2>
+  <p class="s-sub">Каждый час без проверки — это риск потерять всё нажитое.</p>
+
+  <div class="prob-grid">
+    <div class="prob-col">
+      <div class="prob-big"><span class="cnt2" data-t="73">0</span><span class="sup-accent">%</span></div>
+      <div class="prob-name">Токенов содержат скам-код</div>
+      <div class="prob-desc">Большинство новых токенов имеют honeypot-механизм или rug pull в контракте.</div>
+      <div class="prob-badge">Honeypot Risk</div>
+    </div>
+    <div class="prob-col">
+      <div class="prob-big"><span class="cnt2" data-t="68">0</span><span class="sup-accent">%</span></div>
+      <div class="prob-name">NFT без верификации</div>
+      <div class="prob-desc">Подделки и NFT с украденными правами — норма без правильного аудита коллекции.</div>
+      <div class="prob-badge">Auth Failure</div>
+    </div>
+    <div class="prob-col">
+      <div class="prob-big"><span style="font-family:var(--font-mono);font-size:30px;color:var(--danger)">$</span><span class="cnt2" data-t="4200">0</span></div>
+      <div class="prob-name">Средний убыток в год</div>
+      <div class="prob-desc">Без регулярной проверки активов средний трейдер теряет тысячи долларов ежегодно.</div>
+      <div class="prob-badge">Revenue Leak</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOOLS ═══ -->
+<section class="sect-dark">
+  <div class="s-eyebrow" style="color:var(--accent2)">
+    <span style="width:20px;height:1px;background:var(--accent2);display:inline-block"></span>
+    Инструменты
+  </div>
+  <h2 class="s-title-light">Полный арсенал<br>Web3 безопасности.</h2>
+  <p class="s-sub-light">Не просто сканер — платформа полного цикла защиты активов.</p>
+
+  <div class="bento">
+    <div class="b-tile featured">
+      <svg class="t-ico" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="13" stroke="#3b82f6" stroke-width="1.5"/>
+        <circle cx="17" cy="17" r="5" stroke="#3b82f6" stroke-width="1.5"/>
+        <line x1="17" y1="4" x2="17" y2="9" stroke="#3b82f6" stroke-width="1.5"/>
+        <line x1="17" y1="25" x2="17" y2="30" stroke="#3b82f6" stroke-width="1.5"/>
+        <line x1="4" y1="17" x2="9" y2="17" stroke="#3b82f6" stroke-width="1.5"/>
+        <line x1="25" y1="17" x2="30" y2="17" stroke="#3b82f6" stroke-width="1.5"/>
+      </svg>
+      <div class="t-name">Проверка кошелька</div>
+      <div class="t-desc">Полный анализ адреса: история транзакций, связи со скам-адресами, баланс по всем сетям и оценка уровня риска в режиме реального времени. Поддержка ETH, BSC, SOL, MATIC и ещё 2 сетей.</div>
+      <div class="t-tag">Core · Web3 Infrastructure</div>
+      <div class="t-bar">
+        <div class="t-bar-meta"><span>SECURITY SCORE</span><span>87 / 100</span></div>
+        <div class="t-track"><div class="t-fill" data-w="87" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="b-tile">
+      <svg class="t-ico" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="11" stroke="#3b82f6" stroke-width="1.5"/>
+        <path d="M12 17h10M17 12v10" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <div class="t-name">Проверка токена</div>
+      <div class="t-desc">Honeypot детектор, аудит смарт-контракта, анализ ликвидности.</div>
+      <div class="t-tag">Web3 Infrastructure</div>
+    </div>
+
+    <div class="b-tile">
+      <svg class="t-ico" viewBox="0 0 34 34" fill="none">
+        <rect x="5" y="5" width="24" height="24" rx="3" stroke="#3b82f6" stroke-width="1.5"/>
+        <rect x="10" y="10" width="14" height="14" stroke="#06b6d4" stroke-width="1"/>
+        <circle cx="17" cy="17" r="2" fill="#3b82f6"/>
+      </svg>
+      <div class="t-name">Проверка NFT</div>
+      <div class="t-desc">Подлинность коллекции, royalty права, история сделок.</div>
+      <div class="t-tag">Web3 Infrastructure</div>
+    </div>
+
+    <div class="b-tile">
+      <svg class="t-ico" viewBox="0 0 34 34" fill="none">
+        <rect x="3" y="3" width="28" height="28" rx="2" stroke="#3b82f6" stroke-width="1.5"/>
+        <polyline points="7,22 12,15 17,18 22,11 27,8" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="t-name">DEX Аналитика</div>
+      <div class="t-desc">Пулы, объёмы, риски ликвидности в реальном времени.</div>
+      <div class="t-tag">Финансы</div>
+    </div>
+
+    <div class="b-tile">
+      <svg class="t-ico" viewBox="0 0 34 34" fill="none">
+        <rect x="4" y="9" width="26" height="19" rx="2" stroke="#3b82f6" stroke-width="1.5"/>
+        <line x1="4" y1="15" x2="30" y2="15" stroke="#3b82f6" stroke-width="1"/>
+        <circle cx="9" cy="22" r="2.5" fill="#06b6d4"/>
+        <rect x="15" y="20" width="10" height="2.5" rx="1" fill="rgba(59,130,246,0.3)"/>
+      </svg>
+      <div class="t-name">CEX Мониторинг</div>
+      <div class="t-desc">Резервы бирж, статус и рейтинг надёжности платформ.</div>
+      <div class="t-tag">Финансы</div>
+    </div>
+
+    <div class="b-tile">
+      <svg class="t-ico" viewBox="0 0 34 34" fill="none">
+        <rect x="3" y="9" width="28" height="18" rx="2" stroke="#3b82f6" stroke-width="1.5"/>
+        <circle cx="22" cy="18" r="4" stroke="#06b6d4" stroke-width="1.5"/>
+        <line x1="3" y1="14" x2="31" y2="14" stroke="rgba(59,130,246,0.4)" stroke-width="1"/>
+      </svg>
+      <div class="t-name">Рейтинг кошельков</div>
+      <div class="t-desc">Сравнение безопасности популярных крипто-кошельков.</div>
+      <div class="t-tag">Финансы</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STEPS ═══ -->
+<section class="sect-steps">
+  <div class="steps-inner">
+    <div class="s-eyebrow">Как это работает</div>
+    <h2 class="s-title">Три шага до<br>безопасных активов.</h2>
+  </div>
+
+  <div class="s-grid">
+    <div class="step">
+      <div class="step-box">01</div>
+      <div class="step-name">Введи адрес</div>
+      <div class="step-desc">Вставь адрес кошелька, токена или NFT. Регистрация не нужна.</div>
+      <div class="step-note">⏱ 10 секунд</div>
+    </div>
+    <div class="step">
+      <div class="step-box">02</div>
+      <div class="step-name">Запусти анализ</div>
+      <div class="step-desc">Платформа автоматически сканирует блокчейн и базы угроз.</div>
+      <div class="step-note">⏱ 5–30 секунд</div>
+    </div>
+    <div class="step">
+      <div class="step-box">03</div>
+      <div class="step-name">Получи отчёт</div>
+      <div class="step-desc">Оценка риска с детальными рекомендациями. Действуй уверенно.</div>
+      <div class="step-note" style="color:var(--accent);opacity:1">✦ Всегда бесплатно</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA BAND ═══ -->
+<section class="cta-band">
+  <div class="cta-orb"></div>
+
+  <div class="cta-tag">
+    <div class="pulse-dot"></div>
+    Платформа активна · 12K пользователей онлайн
+  </div>
+
+  <h2 class="cta-title">
+    Начни защищать<br>
+    активы <span class="it">прямо сейчас</span>
+  </h2>
+
+  <p class="cta-desc">
+    Бесплатный доступ ко всем инструментам без регистрации.
+    Первая проверка — уже через 30 секунд.
+  </p>
+
+  <div class="cta-btns">
+    <button class="cta-btn-main">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Открыть платформу
+    </button>
+    <button class="cta-btn-sec">Читать документацию →</button>
+  </div>
+
+  <div class="cta-note">// Без регистрации · Без ограничений · Без оплаты</div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="f-logo">
+        <div class="logo-mark">K</div>
+        KLMsecurity<span style="color:var(--accent)">.</span>xyz
+      </div>
+      <p class="f-tagline">
+        Профессиональная платформа безопасности для Web3 пользователей и трейдеров.
+      </p>
+      <div class="f-status">
+        <div class="pulse-dot"></div>
+        All systems nominal
+      </div>
+    </div>
+
+    <div class="footer-links">
+
+      <!-- Инструменты -->
+      <div class="f-col">
+        <div class="f-col-title">Инструменты</div>
+        <ul>
+          <li><a href="#">Проверка кошелька</a></li>
+          <li><a href="#">Проверка токена</a></li>
+          <li><a href="#">Проверка NFT</a></li>
+          <li><a href="#">DEX Аналитика</a></li>
+          <li><a href="#">CEX Мониторинг <span class="f-badge new">New</span></a></li>
+          <li><a href="#">Рейтинг кошельков</a></li>
+        </ul>
+      </div>
+
+      <!-- Документация -->
+      <div class="f-col">
+        <div class="f-col-title">Документация</div>
+        <ul>
+          <li><a href="#">Начало работы</a></li>
+          <li><a href="#">API Reference <span class="f-badge">Beta</span></a></li>
+          <li><a href="#">Гайды и туториалы</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Статус системы</a></li>
+        </ul>
+      </div>
+
+      <!-- Поддержка -->
+      <div class="f-col">
+        <div class="f-col-title">Поддержка</div>
+        <ul>
+          <li><a href="#">FAQ — частые вопросы</a></li>
+          <li><a href="#">Telegram-сообщество</a></li>
+          <li><a href="#">Сообщить об ошибке</a></li>
+          <li><a href="#">Предложить функцию</a></li>
+          <li><a href="#">Написать в поддержку</a></li>
+        </ul>
+      </div>
+
+      <!-- Компания -->
+      <div class="f-col">
+        <div class="f-col-title">О проекте</div>
+        <ul>
+          <li><a href="#">О нас</a></li>
+          <li><a href="#">Безопасность данных</a></li>
+          <li><a href="#">Политика конфиденц.</a></li>
+          <li><a href="#">Условия использования</a></li>
+          <li><a href="#">Партнёрство</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="f-copy">© 2025 KLMsecurity.xyz · Web3 Security Platform · v2.4.1</div>
+    <div class="f-links-bottom">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Cookies</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<!-- BOTTOM TICKER -->
+<div class="bticker"><div class="ticker-track" id="bt"></div></div>
+
+<script>
+// TICKER
+const TD = [
+  {k:'Кошельков', v:'48,231', c:'+12.4%', pos:true},
+  {k:'Угроз', v:'3,847', c:'+2.1%', pos:false},
+  {k:'Пользователей', v:'12.4K', c:'+8.1%', pos:true},
+  {k:'Honeypot', v:'1,203', c:'+48.7%', pos:false},
+  {k:'Latency', v:'47ms', c:'', pos:true},
+  {k:'Сетей', v:'6', c:'', pos:true},
+  {k:'Rug Pull', v:'312', c:'+24.3%', pos:false},
+  {k:'Scan/день', v:'9,400', c:'+5.2%', pos:true},
+  {k:'All Systems', v:'Nominal', c:'', pos:true},
+];
+
+function mkTicker(id) {
+  const el = document.getElementById(id);
+  [...TD,...TD].forEach(d => {
+    const s = document.createElement('span');
+    s.className = 't-item';
+    s.innerHTML = `<span class="k">${d.k}</span><span class="v">${d.v}</span>${d.c?`<span class="${d.pos?'up':'down'}">${d.pos?'↑':'↑'}${d.c}</span>`:''}`;
+    el.appendChild(s);
+  });
+}
+mkTicker('tt'); mkTicker('bt');
+
+// MINI CHART
+const hs = [30,50,38,68,42,80,56,88,48,72,60,84,70,92,65,78];
+const mc = document.getElementById('miniChart');
+hs.forEach((h,i) => {
+  const b = document.createElement('div');
+  b.className = 'b' + (i===hs.length-1?' hi':'');
+  b.style.height = h+'%';
+  mc.appendChild(b);
+});
+
+// COUNT UP
+function countUp(el, target, dur=1300) {
+  const step = target / (dur/16);
+  let cur = 0;
+  const t = setInterval(() => {
+    cur += step;
+    if(cur >= target){ cur = target; clearInterval(t); }
+    el.textContent = target > 999
+      ? Math.floor(cur).toLocaleString('ru')
+      : Math.floor(cur);
+  }, 16);
+}
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(!e.isIntersecting) return;
+    e.target.querySelectorAll('.cnt').forEach(el => countUp(el, +el.dataset.t));
+    e.target.querySelectorAll('.cnt2').forEach(el => countUp(el, +el.dataset.t, 800));
+    e.target.querySelectorAll('.t-fill[data-w]').forEach(el => {
+      setTimeout(() => el.style.width = el.dataset.w + '%', 200);
+    });
+    io.unobserve(e.target);
+  });
+}, {threshold: 0.25});
+
+document.querySelectorAll('.stats-strip, .sect-cream, .sect-dark').forEach(el => io.observe(el));
+
+// NAV ACTIVE
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.nav-links a').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
