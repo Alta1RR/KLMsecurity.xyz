@@ -1,23 +1,30 @@
 package io.cryptoguard.security_api.controller;
 
+import io.cryptoguard.security_api.dto.ReportRequest;
 import io.cryptoguard.security_api.dto.WalletCheckResponse;
-import io.cryptoguard.security_api.model.WalletReport;
 import io.cryptoguard.security_api.service.SecurityAggregatorService;
+import io.cryptoguard.security_api.util.InputValidator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * Контроллер безопасности.
  * Обрабатывает запросы на проверку крипто-адресов, URL-ссылок
- * и прием пользовательских жалоб
+ * и прием пользовательских жалоб.
+ *
+ * Все пользовательские входы предварительно санитизируются через {@link InputValidator}
+ * (длина, формат, обязательность полей), чтобы защитить БД и внешние API от мусора.
  */
 @RestController
 @RequestMapping("/api/v1")
 public class SecurityController {
 
-    private final SecurityAggregatorService goPlusService;
+    private final SecurityAggregatorService aggregator;
 
-    public SecurityController(SecurityAggregatorService goPlusService) {
-        this.goPlusService = goPlusService;
+    public SecurityController(SecurityAggregatorService aggregator) {
+        this.aggregator = aggregator;
     }
 
     // --- БЛОК ПРОВЕРОК (ЧТЕНИЕ) ---
@@ -33,7 +40,9 @@ public class SecurityController {
      */
     @GetMapping("/check")
     public String check(@RequestParam String target, @RequestParam String chainName) {
-        return goPlusService.checkAddress(target, chainName);
+        String safeTarget = InputValidator.requireAddress(target);
+        String safeChain = InputValidator.requireChainName(chainName);
+        return aggregator.checkAddress(safeTarget, safeChain);
     }
 
     /**
@@ -46,36 +55,53 @@ public class SecurityController {
      */
     @GetMapping("/check/details")
     public WalletCheckResponse checkDetails(@RequestParam String target, @RequestParam String chainName) {
-        return goPlusService.checkAddressDetails(target, chainName);
+        String safeTarget = InputValidator.requireAddress(target);
+        String safeChain = InputValidator.requireChainName(chainName);
+        return aggregator.checkAddressDetails(safeTarget, safeChain);
     }
 
     /**
-     * Проверка URL-ссылки на фишинг и вредоносное ПО
-     * Использует API VirusTotal для анализа безопасности Web2
+     * Проверка URL-ссылки на фишинг и вредоносное ПО.
+     * Использует API VirusTotal для анализа безопасности Web2.
      *
      * @param url Полная ссылка для анализа
      * @return Статистика антивирусных срабатываний и рекомендация
      */
     @GetMapping("/check-url")
     public String checkUrl(@RequestParam String url) {
-        return goPlusService.checkUrl(url);
+        String safeUrl = InputValidator.requireUrl(url);
+        return aggregator.checkUrl(safeUrl);
     }
 
     // --- БЛОК ВЗАИМОДЕЙСТВИЯ С СООБЩЕСТВОМ (ЗАПИСЬ) ---
 
     /**
-     * Прием новой жалобы на мошенничество от пользователя
-     * Данные сохраняются в базу данных
+     * Прием новой жалобы на мошенничество от пользователя.
+     * Данные сохраняются в базу данных после валидации входа
+     * (длина, обязательные поля, формат адреса).
      *
-     * @param report Объект жалобы, содержащий адрес, тип скама и описание
-     * @return Подтверждение успешного добавления в базу
+     * Вход принимается через отдельный DTO {@link ReportRequest},
+     * чтобы клиент не мог подменить id/createdAt у сущности.
+     *
+     * @param request Объект жалобы (адрес, тип скама, имя кошелька, описание)
+     * @return JSON со статусом обработки
      */
     @PostMapping("/report")
-    public String submitReport(@RequestBody WalletReport report) {
-        boolean saved = goPlusService.addReport(report);
-        if (!saved) {
-            return "⚠️ Жалоба не сохранена: локальная база user_reports недоступна или не создана.";
+    public ResponseEntity<Map<String, String>> submitReport(@RequestBody(required = false) ReportRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("report body is required");
         }
-        return "✅ Ваша жалоба на адрес " + report.getAddress() + " успешно принята и добавлена в базу.";
+        boolean saved = aggregator.addReport(request);
+        if (!saved) {
+            // Локальная БД недоступна — не врём клиенту «принято».
+            return ResponseEntity.status(503).body(Map.of(
+                    "status", "error",
+                    "message", "Жалоба не сохранена: локальная база недоступна."
+            ));
+        }
+        return ResponseEntity.ok(Map.of(
+                "status", "ok",
+                "message", "Жалоба принята и добавлена в базу."
+        ));
     }
 }

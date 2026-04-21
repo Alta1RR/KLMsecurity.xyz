@@ -1,0 +1,26 @@
+package io.cryptoguard.security_api.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Value("${app.cors.allowed-origins:}")
+    private String allowedOrigins;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = allowedOrigins == null || allowedOrigins.isBlank()
+                ? new String[]{"http://localhost:18081", "http://127.0.0.1:18081"}
+                : allowedOrigins.split("\\s*,\\s*");
+
+        registry.addMapping("/api/**")
+                .allowedOrigins(origins)
+                .allowedMethods("GET", "POST", "OPTIONS")
+                .allowedHeaders("*")
+                .maxAge(3600);
+    }
+}

@@ -3,11 +3,13 @@ import io.cryptoguard.security_api.Repository.ChainRepository;
 import io.cryptoguard.security_api.Repository.ReportRepository;
 import io.cryptoguard.security_api.dto.GoPlusResponse;
 import io.cryptoguard.security_api.dto.MoralisBalanceResponse;
+import io.cryptoguard.security_api.dto.ReportRequest;
 import io.cryptoguard.security_api.dto.ScorechainResponse;
 import io.cryptoguard.security_api.dto.VirusTotalResponse;
 import io.cryptoguard.security_api.dto.WalletCheckResponse;
 import io.cryptoguard.security_api.model.Chain;
 import io.cryptoguard.security_api.model.WalletReport;
+import io.cryptoguard.security_api.util.InputValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,13 +19,15 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
@@ -31,16 +35,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Основной сервис системы.
- * Агрегирует данные из внешних систем безопасности
- * и сопоставляет их с локальной базой данных.
- */
 @Service
 public class SecurityAggregatorService {
 
     private static final DateTimeFormatter REPORT_TIME_FORMAT =
             DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss");
+
+    private static final Duration EXTERNAL_CALL_TIMEOUT = Duration.ofSeconds(8);
 
     @Value("${moralis.api.key:}")
     private String moralisKey;
@@ -51,67 +52,64 @@ public class SecurityAggregatorService {
     @Value("${virustotal.api.key:}")
     private String vtKey;
 
-    private final WebClient webClient;
+    @Value("${app.limits.max-description-length:2000}")
+    private int maxDescriptionLength;
+
+    @Value("${app.limits.max-wallet-name-length:128}")
+    private int maxWalletNameLength;
+
+    @Value("${app.limits.max-scam-type-length:64}")
+    private int maxScamTypeLength;
+
+    private final WebClient goPlusClient;
+    private final WebClient externalClient;
     private final ChainRepository chainRepository;
     private final ReportRepository reportRepository;
 
-    /**
-     * Конструктор с инициализацией WebClient.
-     * Настроен кастомный DNS-резолвер для корректной работы через VPN/Прокси.
-     */
     public SecurityAggregatorService(WebClient.Builder builder,
                                      ChainRepository chainRepository,
                                      ReportRepository reportRepository) {
-        HttpClient httpClient = HttpClient.create()
-                .resolver(io.netty.resolver.DefaultAddressResolverGroup.INSTANCE);
-
-        this.webClient = builder
-                .clientConnector(new org.springframework.http.client.reactive.ReactorClientHttpConnector(httpClient))
-                .baseUrl("https://api.gopluslabs.io")
-                .defaultHeader("User-Agent", "Mozilla/5.0")
-                .build();
-
+        this.goPlusClient = builder.clone().baseUrl("https://api.gopluslabs.io").build();
+        this.externalClient = builder.clone().build();
         this.chainRepository = chainRepository;
         this.reportRepository = reportRepository;
     }
 
-    /**
-     * Текстовая версия отчета для обратной совместимости.
-     */
-    @Cacheable(value = "walletChecks", key = "#target + '|' + #chainName")
+    @Cacheable(value = "walletChecks", key = "#target + '|' + #chainName", unless = "#result == null || #result.startsWith('❌')")
     public String checkAddress(String target, String chainName) {
         return buildTextReport(buildWalletCheckResponse(target, chainName));
     }
 
-    /**
-     * Структурированный ответ для фронтенда.
-     */
-    @Cacheable(value = "walletCheckDetails", key = "#target + '|' + #chainName")
+    @Cacheable(value = "walletCheckDetails", key = "#target + '|' + #chainName",
+            unless = "#result == null || 'ERROR'.equals(#result.verdict)")
     public WalletCheckResponse checkAddressDetails(String target, String chainName) {
         return buildWalletCheckResponse(target, chainName);
     }
 
-    /**
-     * Проверка безопасности URL-ссылки через API VirusTotal.
-     */
-    public String checkUrl(String url) {
+    public String checkUrl(String rawUrl) {
+        String url = InputValidator.requireUrl(rawUrl);
+
         if (!StringUtils.hasText(vtKey)) {
             return "⚠️ Проверка ссылки недоступна: не задан VIRUSTOTAL_API_KEY.";
         }
 
         try {
             String urlId = Base64.getUrlEncoder()
-                    .encodeToString(url.getBytes())
-                    .replace("=", "");
+                    .withoutPadding()
+                    .encodeToString(url.getBytes(StandardCharsets.UTF_8));
 
-            VirusTotalResponse response = webClient.get()
+            VirusTotalResponse response = externalClient.get()
                     .uri("https://www.virustotal.com/api/v3/urls/" + urlId)
                     .header("x-apikey", vtKey)
                     .retrieve()
                     .bodyToMono(VirusTotalResponse.class)
+                    .timeout(EXTERNAL_CALL_TIMEOUT)
                     .block();
 
-            if (response == null || response.getData() == null) {
+            if (response == null
+                    || response.getData() == null
+                    || response.getData().getAttributes() == null
+                    || response.getData().getAttributes().getLast_analysis_stats() == null) {
                 return "⚠️ Данные по ссылке не найдены.";
             }
 
@@ -133,19 +131,25 @@ public class SecurityAggregatorService {
             }
             return report.toString();
         } catch (Exception e) {
-            return "❌ Ошибка при проверке ссылки: " + e.getMessage();
+            return "❌ Ошибка при проверке ссылки.";
         }
     }
 
-    /**
-     * Сохранение новой жалобы в локальную базу данных.
-     * Сбрасывает кеш, чтобы при следующей проверке данные обновились.
-     */
     @Caching(evict = {
             @CacheEvict(value = "walletChecks", allEntries = true),
             @CacheEvict(value = "walletCheckDetails", allEntries = true)
     })
-    public boolean addReport(WalletReport report) {
+    public boolean addReport(ReportRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("report is required");
+        }
+        WalletReport report = new WalletReport();
+        report.setAddress(InputValidator.requireAddress(request.getAddress()));
+        report.setScamType(InputValidator.requireNonBlank(
+                InputValidator.limit(request.getScamType(), maxScamTypeLength), "scamType"));
+        report.setWalletName(InputValidator.limit(request.getWalletName(), maxWalletNameLength));
+        report.setDescription(InputValidator.limit(request.getDescription(), maxDescriptionLength));
+
         try {
             reportRepository.save(report);
             return true;
@@ -435,12 +439,13 @@ public class SecurityAggregatorService {
         }
 
         try {
-            ScorechainResponse aml = webClient.get()
+            ScorechainResponse aml = externalClient.get()
                     .uri("https://api.scorechain.com/v1/" + blockchain + "/addresses/" + target)
                     .header("X-API-KEY", scorechainKey)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .bodyToMono(ScorechainResponse.class)
+                    .timeout(EXTERNAL_CALL_TIMEOUT)
                     .block();
 
             if (aml == null) {
@@ -484,7 +489,7 @@ public class SecurityAggregatorService {
         }
 
         try {
-            GoPlusResponse goPlus = webClient.get()
+            GoPlusResponse goPlus = goPlusClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/api/v1/address_security/" + target)
                             .queryParam("chain_id", chain.getChainId())
@@ -492,6 +497,7 @@ public class SecurityAggregatorService {
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .bodyToMono(GoPlusResponse.class)
+                    .timeout(EXTERNAL_CALL_TIMEOUT)
                     .block();
 
             Map<String, Object> result = asObjectMap(extractGoPlusResult(goPlus, target));
@@ -563,22 +569,32 @@ public class SecurityAggregatorService {
         }
 
         try {
-            MoralisBalanceResponse response = webClient.get()
+            MoralisBalanceResponse response = externalClient.get()
                     .uri("https://deep-index.moralis.io/api/v2.2/" + target + "/balance?chain=" + moralisChain)
                     .header("X-API-Key", moralisKey)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .bodyToMono(MoralisBalanceResponse.class)
+                    .timeout(EXTERNAL_CALL_TIMEOUT)
                     .block();
 
-            if (response == null || response.getBalance() == null) {
+            if (response == null || !StringUtils.hasText(response.getBalance())) {
                 balance.setAvailable(false);
                 balance.setDisplay("Недоступно");
                 balance.setNote("Moralis не вернул баланс по адресу.");
                 return balance;
             }
 
-            BigDecimal rawBalance = new BigDecimal(response.getBalance());
+            BigDecimal rawBalance;
+            try {
+                rawBalance = new BigDecimal(response.getBalance().trim());
+            } catch (NumberFormatException nfe) {
+                balance.setAvailable(false);
+                balance.setDisplay("Недоступно");
+                balance.setNote("Moralis вернул некорректное значение баланса.");
+                return balance;
+            }
+
             BigDecimal divisor = BigDecimal.TEN.pow(resolveNativeDecimals(chain));
             BigDecimal normalized = rawBalance.divide(divisor, 8, RoundingMode.DOWN);
             String value = formatAmount(normalized);
@@ -595,24 +611,43 @@ public class SecurityAggregatorService {
         }
     }
 
-    private Chain resolveChain(String chainName) {
+    Chain resolveChain(String chainName) {
+        if (chainName == null || chainName.isBlank()) {
+            return ChainCatalog.findBuiltin(chainName).orElse(null);
+        }
+
         String normalizedQuery = ChainCatalog.normalizeQuery(chainName);
+        String trimmedQuery = chainName.trim();
 
         try {
-            List<Chain> chains = chainRepository.findByChainNameContainingIgnoreCase(normalizedQuery);
-            if (!chains.isEmpty()) {
-                return chains.get(0);
-            }
+            List<Chain> byName = chainRepository.findByChainNameContainingIgnoreCase(normalizedQuery);
+            Chain exact = findExactMatch(byName, normalizedQuery, trimmedQuery);
+            if (exact != null) return exact;
 
-            chains = chainRepository.findByChainSymbolContainingIgnoreCase(normalizedQuery);
-            if (!chains.isEmpty()) {
-                return chains.get(0);
-            }
+            List<Chain> bySymbol = chainRepository.findByChainSymbolContainingIgnoreCase(trimmedQuery);
+            exact = findExactMatch(bySymbol, normalizedQuery, trimmedQuery);
+            if (exact != null) return exact;
+
+            if (!byName.isEmpty()) return byName.get(0);
+            if (!bySymbol.isEmpty()) return bySymbol.get(0);
         } catch (DataAccessException ex) {
             return ChainCatalog.findBuiltin(chainName).orElse(null);
         }
 
         return ChainCatalog.findBuiltin(chainName).orElse(null);
+    }
+
+    private Chain findExactMatch(List<Chain> candidates, String normalizedName, String rawQuery) {
+        String normLc = normalizedName == null ? "" : normalizedName.toLowerCase(Locale.ROOT);
+        String rawLc = rawQuery == null ? "" : rawQuery.toLowerCase(Locale.ROOT);
+        for (Chain c : candidates) {
+            String name = safeLower(c.getChainName());
+            String sym = safeLower(c.getChainSymbol());
+            if (name.equals(normLc) || name.equals(rawLc) || sym.equals(rawLc)) {
+                return c;
+            }
+        }
+        return null;
     }
 
     private String resolveScorechainChainKey(Chain chain) {
@@ -650,15 +685,18 @@ public class SecurityAggregatorService {
         return null;
     }
 
-    private boolean supportsGoPlus(Chain chain) {
+    boolean supportsGoPlus(Chain chain) {
+        if (chain == null) return false;
         String providerType = safeLower(chain.getProviderType());
         String name = safeLower(chain.getChainName());
-        return providerType.contains("evm") || !name.contains("solana");
+        if (providerType.contains("evm")) return true;
+        // Fallback: known EVM names even if providerType is blank
+        return name.contains("ethereum") || name.contains("bnb") || name.contains("binance")
+                || name.contains("polygon");
     }
 
     private boolean supportsMoralisBalance(Chain chain) {
-        String name = safeLower(chain.getChainName());
-        return resolveMoralisChainKey(chain) != null && !name.contains("solana");
+        return resolveMoralisChainKey(chain) != null;
     }
 
     private int resolveNativeDecimals(Chain chain) {
@@ -699,7 +737,6 @@ public class SecurityAggregatorService {
         return resultMap.values().stream().findFirst().orElse(null);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> asObjectMap(Object value) {
         if (value instanceof Map<?, ?> mapValue) {
             Map<String, Object> normalized = new LinkedHashMap<>();
@@ -781,11 +818,20 @@ public class SecurityAggregatorService {
         report.append("📊 Security Score: ").append(response.getScore()).append("/100").append("\n");
         report.append("🧭 Риск: ").append(mapRiskLevel(response.getRiskLevel())).append("\n");
         report.append("🕒 Проверено: ")
-                .append(REPORT_TIME_FORMAT.format(OffsetDateTime.parse(response.getCheckedAt())))
+                .append(formatCheckedAt(response.getCheckedAt()))
                 .append("\n");
         report.append("📝 ").append(response.getVerdictSummary());
 
         return report.toString();
+    }
+
+    private String formatCheckedAt(String iso) {
+        if (iso == null || iso.isBlank()) return "—";
+        try {
+            return REPORT_TIME_FORMAT.format(OffsetDateTime.parse(iso));
+        } catch (DateTimeParseException ex) {
+            return iso;
+        }
     }
 
     private void appendTextSection(StringBuilder report, WalletCheckResponse.SourceCheck source) {
@@ -843,7 +889,7 @@ public class SecurityAggregatorService {
     }
 
     private String mapRiskLevel(String riskLevel) {
-        return switch (riskLevel) {
+        return switch (riskLevel == null ? "" : riskLevel) {
             case "LOW" -> "Низкий";
             case "MEDIUM" -> "Средний";
             case "HIGH" -> "Высокий";
@@ -852,7 +898,7 @@ public class SecurityAggregatorService {
     }
 
     private String normalizeSectionStatus(String status) {
-        return switch (status) {
+        return switch (status == null ? "" : status) {
             case "danger" -> "danger";
             case "unsupported", "unavailable" -> "warn";
             case "ok" -> "ok";
