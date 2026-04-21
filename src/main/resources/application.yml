@@ -49,7 +49,9 @@ app:
     max-wallet-name-length: 128
     max-scam-type-length: 64
   cors:
-    allowed-origins: http://localhost:18081,http://127.0.0.1:18081
+    # Список через запятую. Поддерживает шаблоны: "*", "https://*.example.com", "http://localhost:*".
+    # Переопределить в проде: CORS_ALLOWED_ORIGINS="https://cryptosentinel.duckdns.org,https://*.mydomain.tld"
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*,https://*.duckdns.org}
 
 logging:
   level:
