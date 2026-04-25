@@ -4,8 +4,12 @@ import './Navbar.css'
 const NAV_LINKS = [
   { label: 'Главная',      id: 'home' },
   { label: 'Инструменты', id: 'tools' },
-  { label: 'Аналитика',   id: 'analytics' },
-  { label: 'Документация', id: 'docs' },
+  { label: 'Зачем мы вам?', id: 'why' },
+]
+
+const LANGS = [
+  { id: 'eng', label: 'ENG' },
+  { id: 'rus', label: 'RUS' },
 ]
 
 const SCROLL_OFFSET = 84
@@ -19,6 +23,7 @@ function scrollToSection(id) {
 
 export default function Navbar({ onOpenPlatform }) {
   const [active, setActive] = useState('home')
+  const [lang, setLang] = useState('rus')
 
   useEffect(() => {
     const onScroll = () => {
@@ -65,9 +70,18 @@ export default function Navbar({ onOpenPlatform }) {
       </ul>
 
       <div className="nav-right">
-        <div className="online-badge">
-          <div className="pulse-dot" />
-          Онлайн
+        <div className="lang-switch" aria-label="Переключить язык">
+          {LANGS.map(item => (
+            <button
+              key={item.id}
+              type="button"
+              className={`lang-btn${lang === item.id ? ' active' : ''}`}
+              aria-pressed={lang === item.id}
+              onClick={() => setLang(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
         <button className="btn-nav" onClick={onOpenPlatform}>
           Открыть платформу →

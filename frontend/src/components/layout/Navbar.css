@@ -62,21 +62,35 @@
   gap: 14px;
 }
 
-.online-badge {
+.lang-switch {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--accent2);
-  letter-spacing: 0.06em;
+  gap: 4px;
+  padding: 2px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.025);
 }
 
-.pulse-dot {
-  width: 5px; height: 5px;
-  background: var(--accent2);
-  border-radius: 50%;
-  animation: pulse 2.5s infinite;
+.lang-btn {
+  min-width: 36px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: rgba(255,255,255,0.38);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.lang-btn:hover {
+  color: rgba(255,255,255,0.8);
+}
+
+.lang-btn.active {
+  color: var(--white);
+  background: rgba(59,130,246,0.18);
 }
 
 .btn-nav {

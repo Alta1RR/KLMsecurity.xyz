@@ -42,7 +42,7 @@ export default function LandingPage({ onOpenPlatform }) {
         <Steps />
         <CtaBand
           onOpenPlatform={onOpenPlatform}
-          onScrollToDocs={() => scrollToSection('docs')}
+          onScrollToDocs={() => scrollToSection('why')}
         />
         <Footer />
       </main>

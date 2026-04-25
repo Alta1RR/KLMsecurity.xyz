@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Ledger",
+    "website": "https://www.ledger.com/",
+    "description": "Аппаратный кошелек (холодное хранение) для максимальной безопасности криптоактивов. Считается золотым стандартом для долгосрочного хранения.",
+    "networks": "Поддерживает 5500+ токенов: Bitcoin, Ethereum, Cardano, Polkadot, Solana, BNB Chain, Avalanche и другие.",
+    "platforms": "Аппаратное устройство + приложение Ledger Live (Windows, macOS, Linux, iOS, Android)"
+  },
+  {
+    "id": 2,
+    "name": "MetaMask",
+    "website": "https://metamask.io/",
+    "description": "Самый популярный некастодиальный кошелек для работы с DeFi и NFT. Простой интерфейс и широкая поддержка dApps.",
+    "networks": "Ethereum и все EVM-совместимые сети: BSC, Polygon, Arbitrum, Optimism, Avalanche, Base, Linea и другие.",
+    "platforms": "Chrome/Firefox/Brave расширение, iOS, Android"
+  },
+  {
+    "id": 3,
+    "name": "Trust Wallet",
+    "website": "https://trustwallet.com/",
+    "description": "Официальный мобильный кошелек от Binance с открытым исходным кодом. Удобен для новичков.",
+    "networks": "100+ блокчейнов: Bitcoin, Ethereum, BSC, Solana, Tron, Polygon, Avalanche, Cosmos, TON и другие.",
+    "platforms": "iOS, Android, Chrome расширение"
+  },
+  {
+    "id": 4,
+    "name": "Phantom",
+    "website": "https://phantom.app/",
+    "description": "Ведущий кошелек экосистемы Solana с расширенной мультичейн-поддержкой. Быстрый и интуитивный интерфейс.",
+    "networks": "Solana, Ethereum, Polygon, Base, Bitcoin, Sui.",
+    "platforms": "Chrome/Firefox/Brave расширение, iOS, Android"
+  },
+  {
+    "id": 5,
+    "name": "Coinbase Wallet",
+    "website": "https://www.coinbase.com/wallet",
+    "description": "Некастодиальный кошелек от биржи Coinbase. Интеграция с Coinbase и широкая поддержка Layer 2.",
+    "networks": "Ethereum, Solana, Bitcoin, Dogecoin, Litecoin, Polygon, Avalanche, BNB Chain, Optimism, Arbitrum, Base и другие EVM-сети.",
+    "platforms": "iOS, Android, Chrome расширение"
+  },
+  {
+    "id": 6,
+    "name": "Exodus",
+    "website": "https://www.exodus.com/",
+    "description": "Красивый кошелек с встроенным обменником и поддержкой стейкинга. Отлично подходит для начинающих.",
+    "networks": "280+ криптовалют: Bitcoin, Ethereum, Solana, Cardano, Polygon, BNB Chain и другие.",
+    "platforms": "Windows, macOS, Linux, iOS, Android, Chrome расширение"
+  },
+  {
+    "id": 7,
+    "name": "Rabby Wallet",
+    "website": "https://rabby.io/",
+    "description": "Современный кошелек с улучшенной безопасностью для DeFi-операций. Показывает изменения балансов перед транзакцией.",
+    "networks": "Все EVM-совместимые сети: Ethereum, BSC, Polygon, Arbitrum, Optimism, Avalanche и 100+ других.",
+    "platforms": "Chrome/Firefox/Edge расширение, Windows, macOS, iOS, Android"
+  },
+  {
+    "id": 8,
+    "name": "Rainbow",
+    "website": "https://rainbow.me/",
+    "description": "Популярный Ethereum-кошелек с фокусом на NFT и простоту использования. Красочный дизайн.",
+    "networks": "Ethereum, Polygon, Optimism, Arbitrum, Base, BSC, Avalanche, Zora, Blast.",
+    "platforms": "iOS, Android, Chrome расширение"
+  },
+  {
+    "id": 9,
+    "name": "Atomic Wallet",
+    "website": "https://atomicwallet.io/",
+    "description": "Децентрализованный кошелек с встроенным атомарным обменом и стейкингом для 20+ монет.",
+    "networks": "500+ токенов: Bitcoin, Ethereum, BNB Chain, Cardano, Polkadot, Solana, Polygon и другие.",
+    "platforms": "Windows, macOS, Linux, iOS, Android"
+  },
+  {
+    "id": 10,
+    "name": "OKX Wallet",
+    "website": "https://www.okx.com/web3",
+    "description": "Мультичейн-кошелек от биржи OKX с поддержкой более 100 блокчейнов. Интеграция с DeFi и NFT-маркетплейсами.",
+    "networks": "100+ блокчейнов: Bitcoin, Ethereum, Solana, Polygon, BSC, Avalanche, Aptos, Sui, Cosmos, TON и другие.",
+    "platforms": "Chrome/Firefox/Edge расширение, iOS, Android"
+  }
+]

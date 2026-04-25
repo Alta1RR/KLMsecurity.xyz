@@ -4,6 +4,7 @@ import '../components/platform/Checker.css'
 import UrlChecker from '../components/platform/UrlChecker'
 import CexMonitor from '../components/platform/CexMonitor'
 import DexAnalytics from '../components/platform/DexAnalytics'
+import WalletRating from '../components/platform/WalletRating'
 import './PlatformPage.css'
 
 const TOOLS = [
@@ -24,7 +25,7 @@ const TOOLS = [
   },
   {
     id: 'dex',
-    label: 'DEX Аналитика',
+    label: 'Рейтинг DEX',
     tag: 'Финансы',
     icon: (
       <svg width="16" height="16" viewBox="0 0 34 34" fill="none">
@@ -35,13 +36,25 @@ const TOOLS = [
   },
   {
     id: 'cex',
-    label: 'CEX Мониторинг',
+    label: 'Рейтинг CEX',
     tag: 'Финансы',
     icon: (
       <svg width="16" height="16" viewBox="0 0 34 34" fill="none">
         <rect x="4" y="9" width="26" height="19" rx="2" stroke="currentColor" strokeWidth="1.5"/>
         <line x1="4" y1="15" x2="30" y2="15" stroke="currentColor" strokeWidth="1"/>
         <circle cx="9" cy="22" r="2.5" fill="currentColor"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'wallet-rating',
+    label: 'Рейтинг кошельков',
+    tag: 'Wallets',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 34 34" fill="none">
+        <rect x="4" y="9" width="26" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+        <circle cx="22" cy="18" r="4" stroke="currentColor" strokeWidth="1.5"/>
+        <line x1="4" y1="14" x2="30" y2="14" stroke="currentColor" strokeWidth="1"/>
       </svg>
     ),
   },
@@ -64,6 +77,7 @@ function renderTool(id) {
     case 'checker': return <Checker />
     case 'dex':     return <DexAnalytics />
     case 'cex':     return <CexMonitor />
+    case 'wallet-rating': return <WalletRating />
     case 'web2':    return <UrlChecker />
     default:        return null
   }

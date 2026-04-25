@@ -24,15 +24,6 @@ const SCAM_TYPES = [
   'Fake Token', 'Drainer', 'Другое',
 ]
 
-const WALLET_RATINGS = [
-  { name: 'Ledger Nano X', score: 97, type: 'Hardware', pros: ['Офлайн хранение', 'Открытый код', 'Bluetooth'], cons: ['Цена $149+'] },
-  { name: 'Trezor Model T', score: 95, type: 'Hardware', pros: ['Открытый код', 'Сенсорный экран'], cons: ['Нет Bluetooth'] },
-  { name: 'Rabby Wallet', score: 80, type: 'Hot', pros: ['Pre-sign анализ', 'Мульти-чейн'], cons: ['Только десктоп'] },
-  { name: 'Phantom', score: 78, type: 'Hot', pros: ['Solana-нативный', 'NFT-поддержка'], cons: ['Только Solana/EVM'] },
-  { name: 'MetaMask', score: 74, type: 'Hot', pros: ['Популярный', 'DeFi-интеграция'], cons: ['Онлайн', 'Phishing-риск'] },
-  { name: 'Trust Wallet', score: 71, type: 'Hot', pros: ['Мобильный', 'Мульти-чейн'], cons: ['Онлайн', 'Закрытый код'] },
-]
-
 function severityLabel(severity) {
   return severity === 'high' ? 'Высокий' : severity === 'medium' ? 'Средний' : 'Низкий'
 }
@@ -315,8 +306,7 @@ function WalletPanel() {
       {error && <div className="tool-error">{error}</div>}
 
       <ul className="tool-hints">
-        <li>Баланс, AML, технические сигналы и жалобы сообщества теперь показываются отдельно, без склейки в один текст.</li>
-        <li>Если один из ключевых источников недоступен, итог не будет отмечен как безопасный.</li>
+        <li>Проверка криптокошелька (AML-анализ) критична для защиты активов от блокировки на биржах, так как позволяет выявить «грязную» криптовалюту, связанную с мошенничеством, даркнетом или санкциями. Это предотвращает потерю средств, взаимодействие с преступными схемами и помогает соблюдать закон, проверяя контрагента перед сделкой.</li>
       </ul>
 
       <div className="report-card">
@@ -480,44 +470,10 @@ function ReportPanel() {
   )
 }
 
-function RatingPanel() {
-  const wallets = WALLET_RATINGS.slice().sort((a, b) => b.score - a.score)
-  return (
-    <>
-      <ul className="tool-hints">
-        <li>Рейтинг по открытым аудитам и экспертным оценкам безопасности.</li>
-        <li>Hardware-кошельки заметно безопаснее hot-кошельков при равных условиях хранения seed-фразы.</li>
-      </ul>
-      <div className="rating-list">
-        {wallets.map((wallet, index) => (
-          <div className="rating-row" key={wallet.name}>
-            <div className="rating-rank">#{index + 1}</div>
-            <div className="rating-score-bar">
-              <div className="rating-score-fill" style={{ width: `${wallet.score}%` }} />
-            </div>
-            <div className="rating-info">
-              <div className="rating-name-row">
-                <span className="rating-name">{wallet.name}</span>
-                <span className={`rating-type${wallet.type === 'Hardware' ? ' hw' : ''}`}>{wallet.type}</span>
-                <span className="rating-score-num">{wallet.score}/100</span>
-              </div>
-              <div className="rating-details">
-                <span className="rating-pros">{wallet.pros.join(' · ')}</span>
-                <span className="rating-cons">{wallet.cons.join(' · ')}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  )
-}
-
 const TABS = [
   {
     id: 'wallet',
     label: 'Проверка кошелька',
-    eyebrow: 'Web3 · GoPlus · Scorechain · Moralis',
     title: 'Аудит кошелька',
     subtitle: 'Комплексный анализ: баланс, AML-санкции, технические сигналы и репорты сообщества в одном отчёте.',
     panel: WalletPanel,
@@ -525,18 +481,9 @@ const TABS = [
   {
     id: 'report',
     label: 'Сообщить о скаме',
-    eyebrow: 'Community · Internal DB',
     title: 'Жалоба на адрес',
     subtitle: 'Сообщите о мошенническом адресе. Жалоба попадёт в базу и будет показана в следующих проверках.',
     panel: ReportPanel,
-  },
-  {
-    id: 'rating',
-    label: 'Рейтинг кошельков',
-    eyebrow: 'Аналитика',
-    title: 'Рейтинг кошельков',
-    subtitle: 'Сравнение безопасности популярных крипто-кошельков по открытым аудитам.',
-    panel: RatingPanel,
   },
 ]
 
@@ -548,7 +495,6 @@ export default function Checker() {
   return (
     <div className="tool-panel">
       <div className="tool-header">
-        <div className="tool-eyebrow">{active.eyebrow}</div>
         <h2 className="tool-title">{active.title}</h2>
         <p className="tool-subtitle">{active.subtitle}</p>
       </div>

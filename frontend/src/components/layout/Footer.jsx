@@ -4,17 +4,17 @@ const TOOLS_LINKS = [
   'Проверка кошелька',
   'Проверка токена',
   'Проверка NFT',
-  'DEX Аналитика',
-  { label: 'CEX Мониторинг', badge: 'New' },
+  'Рейтинг DEX',
+  { label: 'Рейтинг CEX', badge: 'New' },
   'Рейтинг кошельков',
 ]
 
-const DOCS_LINKS = [
-  'Начало работы',
-  { label: 'API Reference', badge: 'Beta' },
-  'Гайды и туториалы',
-  'Changelog',
-  'Статус системы',
+const WHY_LINKS = [
+  'Контроль кошельков',
+  'AML-анализ',
+  'Риски токенов',
+  'Проверка NFT',
+  'Мониторинг бирж',
 ]
 
 const SUPPORT_LINKS = [
@@ -76,7 +76,7 @@ export default function Footer() {
 
         <div className="footer-links">
           <FooterCol title="Инструменты"  links={TOOLS_LINKS} />
-          <FooterCol title="Документация" links={DOCS_LINKS} />
+          <FooterCol title="Зачем мы вам?" links={WHY_LINKS} />
           <FooterCol title="Поддержка"    links={SUPPORT_LINKS} />
           <FooterCol title="О проекте"    links={ABOUT_LINKS} />
         </div>

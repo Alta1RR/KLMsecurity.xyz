@@ -116,7 +116,49 @@
   border: 1px solid rgba(255,255,255,0.04);
 }
 
+.dex-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dex-info-card {
+  background: var(--black2);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-top-color: rgba(59,130,246,0.22);
+  padding: 16px;
+}
+
+.dex-points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.dex-points li {
+  position: relative;
+  padding-left: 15px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.46);
+}
+
+.dex-points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  background: var(--accent2);
+  box-shadow: 0 0 10px rgba(6,182,212,0.55);
+}
+
 @media (max-width: 640px) {
+  .dex-info-grid { grid-template-columns: 1fr; }
   .dex-card-header { grid-template-columns: 28px 1fr 16px; gap: 10px; padding: 12px; }
   .dex-details { padding-left: 12px; }
   .dex-desc-short { white-space: normal; }

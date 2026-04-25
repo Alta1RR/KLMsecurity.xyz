@@ -1,12 +1,81 @@
 import './Hero.css'
 
+function SecurityPulse() {
+  return (
+    <div className="security-pulse" aria-label="Live security feed">
+      <div className="pulse-head">
+        <span>Live security feed</span>
+        <span className="pulse-live"><span />LIVE</span>
+      </div>
+
+      <div className="pulse-stage">
+        <svg className="pulse-map" viewBox="0 0 360 360" aria-hidden="true">
+          <defs>
+            <pattern id="security-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+              <path d="M24 0H0V24" fill="none" stroke="rgba(255,255,255,0.055)" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="360" height="360" fill="url(#security-grid)" />
+          <g className="pulse-links">
+            <line x1="180" y1="180" x2="96" y2="112" />
+            <line x1="180" y1="180" x2="265" y2="102" />
+            <line x1="180" y1="180" x2="278" y2="244" />
+            <line x1="180" y1="180" x2="104" y2="260" />
+            <line x1="96" y1="112" x2="265" y2="102" />
+            <line x1="104" y1="260" x2="278" y2="244" />
+          </g>
+          <g className="pulse-nodes">
+            <circle cx="96" cy="112" r="3" />
+            <circle cx="265" cy="102" r="3" />
+            <circle cx="278" cy="244" r="3" />
+            <circle cx="104" cy="260" r="3" />
+            <circle cx="180" cy="180" r="4" />
+          </g>
+        </svg>
+
+        <div className="pulse-core">
+          <span className="core-ring ring-one" />
+          <span className="core-ring ring-two" />
+          <span className="core-dot" />
+        </div>
+
+        <div className="pulse-orbit orbit-one">
+          <span className="pulse-particle particle-one" />
+          <span className="pulse-particle particle-two" />
+        </div>
+        <div className="pulse-orbit orbit-two">
+          <span className="pulse-particle particle-three" />
+          <span className="pulse-particle particle-four" />
+        </div>
+
+        <span className="signal-blip blip-one" />
+        <span className="signal-blip blip-two" />
+        <span className="signal-blip blip-three" />
+      </div>
+
+      <div className="pulse-metrics">
+        <div>
+          <span>12</span>
+          active signals
+        </div>
+        <div>
+          <span>3</span>
+          suspicious contracts
+        </div>
+        <div>
+          <span>98.4%</span>
+          network health
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Hero({ onOpenPlatform, guideUrl }) {
   return (
     <section className="hero" id="home">
       <div className="hero-bg">
         <div className="hex-grid" />
-        <div className="glow-orb orb1" />
-        <div className="glow-orb orb2" />
       </div>
 
       <div className="hero-left">
@@ -15,8 +84,6 @@ export default function Hero({ onOpenPlatform, guideUrl }) {
           <span className="eyebrow-accent">KLM_FEED</span>
           <span>·</span>
           STATUS: ACTIVE
-          <span>·</span>
-          УГРОЗ СЕГОДНЯ: 3,847
         </div>
 
         <h1 className="h-title">
@@ -26,9 +93,9 @@ export default function Hero({ onOpenPlatform, guideUrl }) {
         </h1>
 
         <p className="hero-sub">
-          Профессиональные инструменты Web3 безопасности.<br />
+          Все нужные инструменты для Web3 безопасности в одном месте.<br />
           Кошельки, токены, NFT — под полным контролем.<br />
-          Бесплатно. Без регистрации.
+          Всё в одном месте. Удобно. Понятно.
         </p>
 
         <div className="hero-actions">
@@ -59,74 +126,7 @@ export default function Hero({ onOpenPlatform, guideUrl }) {
       </div>
 
       <div className="hero-right">
-        <div className="widget">
-          <div className="w-head">
-            <span className="w-label">SECURITY_SCORE</span>
-            <span className="w-live"><div className="w-live-dot" />LIVE</span>
-          </div>
-          <div className="w-body">
-            <div className="score-display">
-              <div className="score-circle">
-                <svg width="60" height="60" viewBox="0 0 60 60">
-                  <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                  <circle cx="30" cy="30" r="24" fill="none" stroke="url(#sg)" strokeWidth="3"
-                    strokeDasharray="150.8" strokeDashoffset="28" strokeLinecap="round" />
-                  <defs>
-                    <linearGradient id="sg" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="#06b6d4" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="score-text">87</div>
-              </div>
-              <div className="score-info">
-                <div className="score-val">87<span className="score-denom">/100</span></div>
-                <div className="score-lbl">Индекс безопасности</div>
-              </div>
-            </div>
-          </div>
-          <div className="w-footer">◆ <span className="w-accent">ETH · BSC · SOL · MATIC</span> и ещё 2 сети</div>
-        </div>
-
-        <div className="widget">
-          <div className="w-head">
-            <span className="w-label">THREAT_MONITOR</span>
-            <span className="w-live"><div className="w-live-dot" />LIVE</span>
-          </div>
-          <div className="w-body">
-            <div className="bars">
-              {[30,50,38,68,42,80,56,88,48,72,60,84,70,92,65,78].map((h, i, arr) => (
-                <div key={i} className={`bar${i === arr.length - 1 ? ' hi' : ''}`} style={{ height: `${h}%` }} />
-              ))}
-            </div>
-            <div className="chart-stat">
-              <span className="chart-big">34.2%</span>
-              <span className="chart-tag">УРОВЕНЬ УГРОЗ</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="widget">
-          <div className="w-head">
-            <span className="w-label">LIVE_FEED</span>
-            <span className="w-live"><div className="w-live-dot" />LIVE</span>
-          </div>
-          <div className="w-body">
-            {[
-              { name: 'Honeypot токены', count: '1,203', change: '↑ 48.7%', up: true },
-              { name: 'Скам кошельки',  count: '487',   change: '↑ 2.1%',  up: false },
-              { name: 'Rug pull NFT',   count: '312',   change: '↑ 24.3%', up: true },
-            ].map(row => (
-              <div className="feed-row" key={row.name}>
-                <span className="feed-name">{row.name}</span>
-                <span className="feed-count">{row.count}</span>
-                <span className={row.up ? 'feed-up' : 'feed-down'}>{row.change}</span>
-              </div>
-            ))}
-          </div>
-          <div className="w-footer">◆ Avg response: <span className="w-accent">47ms</span></div>
-        </div>
+        <SecurityPulse />
       </div>
     </section>
   )

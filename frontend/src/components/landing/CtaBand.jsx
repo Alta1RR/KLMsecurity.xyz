@@ -28,7 +28,7 @@ export default function CtaBand({ onOpenPlatform, onScrollToDocs }) {
           Открыть платформу
         </button>
         <button className="cta-btn-sec" onClick={onScrollToDocs}>
-          Читать документацию →
+          Зачем мы вам? →
         </button>
       </div>
 

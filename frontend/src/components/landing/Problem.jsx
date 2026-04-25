@@ -57,7 +57,7 @@ export default function Problem() {
   }, [])
 
   return (
-    <section className="sect-problem" ref={ref}>
+    <section className="sect-problem" id="why" ref={ref}>
       <div className="s-eyebrow-dark">Проблема</div>
       <h2 className="s-title-dark">Крипта полна<br />скрытых угроз.</h2>
       <p className="s-sub-dark">Каждый час без проверки — это риск потерять всё нажитое.</p>
